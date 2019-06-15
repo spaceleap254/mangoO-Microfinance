@@ -1,11 +1,6 @@
 <?PHP
-
 //Select Overdue Loan Instalments from LTRANS
-$timestamp = time();
-$sql_overd = "SELECT * FROM loans, ltrans, customer WHERE loans.cust_id = customer.cust_id AND loans.loan_id = ltrans.loan_id AND ltrans_due <= $timestamp AND ltrans_date IS NULL AND loanstatus_id = 2 ORDER BY ltrans_due";
-$query_overd = mysql_query($sql_overd);
-checkSQL($query_overd);
-
+$query_overd = getLtransOverdue ($db_link);
 ?>
 
 <table id="tb_table">
@@ -25,18 +20,16 @@ checkSQL($query_overd);
 		<th>Amount Due</th>
 	</tr>
 	<?PHP
-	$color = 0;
-	while ($row_overd = mysql_fetch_assoc($query_overd)){
-		tr_colored($color);
-		echo '	<td><a href="loan.php?lid='.$row_overd['loan_id'].'">'.$row_overd['loan_no'].'</a></td>
+	while ($row_overd = mysqli_fetch_assoc($query_overd)){
+		echo '<tr>
+						<td><a href="loan.php?lid='.$row_overd['loan_id'].'">'.$row_overd['loan_no'].'</a></td>
 						<td>'.$row_overd['cust_name'].'</td>
 						<td>'.date("d.m.Y",$row_overd['ltrans_due']).'</td>
 						<td>'.number_format($row_overd['ltrans_principaldue']+$row_overd['ltrans_interestdue']).' '.$_SESSION['set_cur'].'</td>
 					</tr>';
-		
+
 		// Module for automatic fine charging
 		if ($_SESSION['set_auf'] != NULL) include './modules/mod_autofine.php';
-		
 	}
 	?>
 </table>

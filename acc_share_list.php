@@ -1,8 +1,8 @@
 <?PHP
 //Select SHARES from database
 $sql_sha = "SELECT * FROM shares, user WHERE shares.user_id = user.user_id AND cust_id = '$_SESSION[cust_id]' ORDER BY share_date DESC";
-$query_sha = mysql_query($sql_sha);
-checkSQL($query_sha);
+$query_sha = mysqli_query($db_link, $sql_sha);
+checkSQL($db_link, $query_sha);
 
 //Make array for exporting data
 $share_exp_date = date("Y-m-d",time());
@@ -38,18 +38,17 @@ $_SESSION['share_exp_title'] = $_SESSION['cust_id'].'_shares_'.$share_exp_date;
 	<?PHP
 	$amount_balance = 0;
 	$value_balance = 0;
-	$color = 0;
-	while($row_sha = mysql_fetch_assoc($query_sha)){
-		tr_colored($color);
-		echo '<td>'.date("d.m.Y",$row_sha['share_date']).'</td>
-					<td>'.$row_sha['share_amount'].'</td>
-					<td>'.number_format($row_sha['share_value']).' '.$_SESSION['set_cur'].'</td>
-					<td>'.$row_sha['share_receipt'].'</td>
-					<td>'.$row_sha['user_name'].'</td>
-					<td>';
-					if($_SESSION['log_delete'] == 1) echo '<a href="acc_share_del.php?sha_id='.$row_sha['share_id'].'" onClick="return randCheck()"><i class="fa fa-remove fa-lg"></i></a>';
-		echo '</td>
-				</tr>';
+	while($row_sha = mysqli_fetch_assoc($query_sha)){
+		echo '<tr>
+						<td>'.date("d.m.Y",$row_sha['share_date']).'</td>
+						<td>'.$row_sha['share_amount'].'</td>
+						<td>'.number_format($row_sha['share_value']).' '.$_SESSION['set_cur'].'</td>
+						<td>'.$row_sha['share_receipt'].'</td>
+						<td>'.$row_sha['user_name'].'</td>
+						<td>';
+						if($_SESSION['log_delete'] == 1) echo '<a href="acc_share_del.php?sha_id='.$row_sha['share_id'].'" onClick="return randCheck()"><i class="fa fa-remove fa-lg"></i></a>';
+			echo '</td>
+					</tr>';
 		$amount_balance = $amount_balance + $row_sha['share_amount'];
 		$value_balance = $value_balance + $row_sha['share_value'];
 		
